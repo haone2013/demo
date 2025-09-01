@@ -1,0 +1,42 @@
+name: Run Script
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Target website URL to test'
+        required: true
+        default: 'https://example.com'
+        type: string
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3  # Safety timeout cho cả job
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential libssl-dev libnghttp2-dev
+
+      - name: Make run.sh executable
+        run: chmod +x run.sh
+
+      - name: Run script (60s timeout)
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Running with custom URL: ${{ github.event.inputs.target_url }}"
+            timeout 60s ./run.sh "${{ github.event.inputs.target_url }}"
+          else
+            echo "Running with default URL"
+            timeout 60s ./run.sh "https://example.com"
+          fi
+          echo "Script completed or timed out after 60 seconds"
