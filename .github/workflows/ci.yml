@@ -31,4 +31,4 @@ jobs:
       - name: Run attack script (Instance #${{ matrix.instance }})
         run: |
           echo "Starting attack from instance ${{ matrix.instance }}"
-          timeout 60s ./run.sh "${{ github.event.inputs.target_url }}"
+          timeout 600s ./run.sh "${{ github.event.inputs.target_url }}"
